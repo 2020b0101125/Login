@@ -3,9 +3,12 @@ import bodyParser from "body-parser";
 import router from "./src/router/dataRoutes.js";
 import errorhandelling from "./src/middleware/errorHandeller.js";
 import createDB from "./src/config/dataConfig.js";
+import cors from "cors";
 
 const app = express();
 await createDB();
+
+app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 
@@ -17,4 +20,4 @@ app.use(errorhandelling);
 app.get("/", (req, res) => {
   res.send("ok");
 });
-app.listen(3000, () => console.log("sever running at port: 3000"));
+app.listen(8000, () => console.log("sever running at port: 8000"));

@@ -1,5 +1,16 @@
 import User from "../config/createSchema.js";
-import { createUser, chkLogin } from "../model/dataModel.js";
+import { createUser, chkLogin, showUser } from "../model/dataModel.js";
+
+export const show = async (req, res) => {
+  try {
+    const resp = await showUser();
+    console.log(resp);
+    res.json(resp);
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
 
 export const register = async (req, res) => {
   const { username, password } = req.body;
