@@ -64,23 +64,32 @@ npm or yarn
 
 ## Backend Setup
 
-    cd back-end
-    npm install
-    node server.js
+    cd back-end (navigate to backe-end folder)
+    npm install (install dependecies)
+    JWT_SECRET=your_super_secret_key (create a .env file in the root of your project)
+    node server.js (run the server)
+
     Server will run at http://localhost:3000
 
 ## Frontend Setup
 
-    cd front-end
-    npm install
-    npm start
+    cd front-end (Navigate to frontend)
+    npm install (install dependecies)
+    npm start (start the frontend)
+
     Frontend will run at http://localhost:5173 or similar (Vite default)
 
+## 🔐 Security Notes
+
+    Passwords are hashed using bcrypt before storage.
+
+    JWTs are signed using a secure, environment-based secret (from .env).
+
+    Protected routes will reject invalid or missing tokens.
+
+    Error handling middleware is implemented globally.
+
 ## 🧪 Future Improvements
-
-    Password is hashed with bcrypt.
-
-    On login, a JWT is generated and stored on client.
 
     Protected routes check for valid token before proceeding.
 
