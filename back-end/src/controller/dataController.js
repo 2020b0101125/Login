@@ -1,5 +1,7 @@
 import User from "../config/createSchema.js";
 import { createUser, chkLogin, showUser } from "../model/dataModel.js";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 export const show = async (req, res) => {
   try {
@@ -38,10 +40,19 @@ export const login = async (req, res) => {
     if (!ans) {
       return res.status(401).json({ error: "invalid username or password" });
     }
-    if (ans.password !== password) {
+    const result = bcrypt.compare(ans.password, password);
+    if (!result) {
       return res.status(401).json({ error: "invalid username or password" });
     }
-    res.status(200).json({ message: "login successful" });
+    const token = jwt.sign(
+      { user: ans.username },
+      "hfjskT3@#JH8kd83jfdskfhs9F@#JH3kjsdhf",
+      {
+        expiresIn: "1h",
+      }
+    );
+    console.log(token);
+    res.status(200).json({ token, message: "login successful" });
   } catch (err) {
     console.error(err);
     res.status().json({ error: "login failed", message: err.message });

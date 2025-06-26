@@ -1,4 +1,5 @@
 import User from "../config/createSchema.js";
+import bcrypt from "bcrypt";
 
 export const showUser = async () => {
   try {
@@ -11,6 +12,8 @@ export const showUser = async () => {
 };
 
 export const createUser = async (username, password) => {
+  password = await bcrypt.hash(password, 10);
+  // console.log(passed);
   try {
     const user = new User({ username, password });
     await user.save();
