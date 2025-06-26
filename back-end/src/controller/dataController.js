@@ -2,6 +2,7 @@ import User from "../config/createSchema.js";
 import { createUser, chkLogin, showUser } from "../model/dataModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { config } from "../config/configENV.js";
 
 export const show = async (req, res) => {
   try {
@@ -40,21 +41,17 @@ export const login = async (req, res) => {
     if (!ans) {
       return res.status(401).json({ error: "invalid username or password" });
     }
-    const result = bcrypt.compare(ans.password, password);
+    const result = bcrypt.compare(password, ans.password);
     if (!result) {
       return res.status(401).json({ error: "invalid username or password" });
     }
-    const token = jwt.sign(
-      { user: ans.username },
-      "hfjskT3@#JH8kd83jfdskfhs9F@#JH3kjsdhf",
-      {
-        expiresIn: "1h",
-      }
-    );
+    const token = jwt.sign({ user: ans.username }, config.SECRET, {
+      expiresIn: "1h",
+    });
     console.log(token);
     res.status(200).json({ token, message: "login successful" });
   } catch (err) {
     console.error(err);
-    res.status().json({ error: "login failed", message: err.message });
+    res.status(500).json({ error: "login failed", message: err.message });
   }
 };
