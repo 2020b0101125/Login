@@ -1,22 +1,69 @@
 import mongoose from "mongoose";
-const bookSchema = new mongoose.Schema({
-  title: String,
-  author: String,
-});
+import AutoIncrementFactory from "mongoose-sequence";
 
-const Book = mongoose.model("Book", bookSchema);
-const UserSchema = new mongoose.Schema({
-  username: {
+const connection = mongoose.createConnection("mongodb://localhost:27017/arnav");
+const autoInc = AutoIncrementFactory(connection);
+
+const UserSchema = new mongoose.Schema(
+  {
+    username: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
+    role: {
+      type: String,
+      enum: ["admin", "manager", "employee"],
+      default: "employee",
+    },
+  },
+  { timestamps: true }
+);
+UserSchema.plugin(autoInc, {
+  inc_field: "userId",
+  start_seq: 1,
+});
+export const User = mongoose.model("member", UserSchema);
+
+const taskSchema = new mongoose.Schema({
+  title: {
     type: String,
     required: true,
-    unique: true,
   },
-  password: {
+  description: String,
+  status: {
     type: String,
-    required: true,
+    enum: ["to-do", "in-progress", "done"],
+    default: "to-do",
+  },
+  dueDate: Date,
+  priority: {
+    type: String,
+    enum: ["low", "medium", "high"],
+    default: "low",
+  },
+  assignedTo: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "member",
+  },
+  assignedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "member",
   },
 });
+taskSchema.plugin(autoInc, {
+  inc_field: "taskId",
+  start_seq: 1,
+});
+export const Task = mongoose.model("Task", taskSchema);
 
-const User = mongoose.model("users", UserSchema);
-
-export default User;
+/*I have to work on logins ,clusters*/
