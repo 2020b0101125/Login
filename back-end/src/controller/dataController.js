@@ -9,7 +9,8 @@ import {
   deleteTaskById,
   getMyInfos,
   deleteTasks,
-  updateTaskById,
+  replaceTaskById,
+  patchTaskById,
 } from "../model/dataModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -150,7 +151,62 @@ export const deleteTask = async (req, res) => {
     res.status(500).json({ message: "error in deleting task by id", err });
   }
 };
-export const updateTask = async () => {};
+export const replaceTask = async (req, res) => {
+  const taskId = req.params.id;
+  const user = req.user;
+  const body = req.body;
+  try {
+    const data = await replaceTaskById(taskId, user, body);
+    if (data === null) {
+      return res.status(404).json({ message: "task not found" });
+    }
+    if (data === 403) {
+      return res
+        .status(403)
+        .json({ message: "managers can only replace their own tasks" });
+    }
+    return res
+      .status(200)
+      .json({ message: "task has been replaced successfully" });
+  } catch (err) {
+    console.error("error in replacing task: ", err);
+    res.status(500).json({ message: "error in replacing task", err });
+  }
+};
+export const patchTask = async (req, res) => {
+  const body = req.body;
+  const taskId = req.params.id;
+  const user = req.user;
+  const allowedFields = [
+    "title",
+    "decription",
+    "status",
+    "dueDate",
+    "priority",
+    "assignedTo",
+  ];
+  const updates = {};
+  for (let key of allowedFields) {
+    if (req.body[key] !== undefined) {
+      updates[key] = body[key];
+    }
+  }
+  try {
+    const data = await patchTaskById(taskId, user, updates);
+    if (data === null) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+    if (data === 403) {
+      return res
+        .status(403)
+        .json({ message: "Managers can patch only their own tasks" });
+    }
+    return res.status(200).json({ message: "Task has been patched" });
+  } catch (err) {
+    console.error("error in patching the task: ", err);
+    res.status(500).json({ message: "error in patchg task", err });
+  }
+};
 export const getMyInfo = async (req, res) => {
   try {
     const data = await getMyInfos(req.user._id);

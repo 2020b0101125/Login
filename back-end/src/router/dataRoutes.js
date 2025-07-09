@@ -7,7 +7,8 @@ import {
   getMyInfo,
   getTask,
   getTaskById,
-  updateTask,
+  replaceTask,
+  patchTask,
   deleteTask,
 } from "../controller/dataController.js";
 import { verifyToken } from "../middleware/verifyToken.js";
@@ -44,7 +45,14 @@ router.put(
   "/task/:id",
   verifyToken,
   requireRole("admin", "manager"),
-  updateTask
+  replaceTask
 );
+router.patch(
+  "/task/:id",
+  verifyToken,
+  requireRole("admin", "manager"),
+  patchTask
+);
+
 router.delete("/task/:id", verifyToken, requireRole("admin"), deleteTask);
 export default router;

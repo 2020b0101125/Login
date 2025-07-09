@@ -127,4 +127,43 @@ export const getMyInfos = async (_id) => {
   }
 };
 export const deleteTasks = async () => {};
-export const updateTaskById = async () => {};
+export const replaceTaskById = async (id, user, body) => {
+  try {
+    const task = await Task.findOne({ taskId: id });
+    if (!task) return null;
+    if (
+      user.role === "manager" &&
+      (!task.assignedBy || !task.assignedBy.equals(user._id))
+    )
+      return 403;
+    task.title = body.title;
+    task.description = body.description;
+    task.status = body.status;
+    task.dueDate = body.dueDate;
+    task.priority = body.priority;
+    task.assignedTo = body.assignedTo;
+    await task.save();
+    return 1;
+  } catch (err) {
+    console.error("error in replacing task by id from db: ", err);
+    throw err;
+  }
+};
+export const patchTaskById = async (id, user, updates) => {
+  try {
+    const data = await Task.findOne({ taskId: id });
+    if (!data) return null;
+    if (
+      (user.role === "manager" && !data.assignedBy) ||
+      !data.assignedBy.equals(user._id)
+    ) {
+      return 403;
+    }
+    Object.assign(data, updates);
+    await data.save();
+    return 200;
+  } catch (err) {
+    console.error("error in patching the task from db: ", err);
+    throw err;
+  }
+};
