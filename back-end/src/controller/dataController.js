@@ -8,14 +8,14 @@ import {
   tasksById,
   deleteTaskById,
   getMyInfos,
-  deleteTasks,
+  savePhoto,
   replaceTaskById,
   patchTaskById,
 } from "../model/dataModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { config } from "../config/configENV.js";
-
+import cloudinary from "../config/cloudinary.js";
 export const show = async (req, res) => {
   const { id, username, role } = req.user;
   let data;
@@ -28,7 +28,7 @@ export const show = async (req, res) => {
     console.log("resp");
   } catch (err) {
     console.error(err);
-    throw err;
+    res.status(500).json({ message: "error in creating tasks" });
   }
 };
 
@@ -56,7 +56,7 @@ export const login = async (req, res) => {
   try {
     const ans = await chkLogin(username, password);
     if (!ans) {
-      return res.status(401).json({ error: "invalid username or password" });
+      return res.status(404).json({ error: "invalid username or password" });
     }
     const result = await bcrypt.compare(password, ans.password);
     if (!result) {
@@ -118,7 +118,7 @@ export const getTaskById = async (req, res) => {
   try {
     const task = await tasksById(req.params.id, req.user);
     if (task === null) {
-      return res.status(200).json({ message: "enter valid id" });
+      return res.status(400).json({ message: "enter valid id" });
     }
     if (task === "manager not allowed") {
       return res
@@ -179,7 +179,7 @@ export const patchTask = async (req, res) => {
   const user = req.user;
   const allowedFields = [
     "title",
-    "decription",
+    "description",
     "status",
     "dueDate",
     "priority",
@@ -215,5 +215,53 @@ export const getMyInfo = async (req, res) => {
   } catch (err) {
     console.error("error in fetching member profile data: ", err);
     res.status(500).json({ message: "error in fetching profile data", err });
+  }
+};
+
+export const addPhoto = async (req, res) => {
+  try {
+    const photo = req.file ? req.file.filename : null;
+    if (!photo)
+      return res
+        .status(401)
+        .json({ message: "Bad request ,please provide a file" });
+    const data = await savePhoto(photo, req.user);
+    if (data === 404)
+      return res.status(404).json({ message: "member not found" });
+    return res
+      .status(201)
+      .json({ message: "Member added successfully", member: data });
+  } catch (err) {
+    console.error("error in adding photo to the server: ", err);
+    res.status(500).json({ message: "erro adding photo to the server", err });
+  }
+};
+
+export const uploadImage = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded" });
+    }
+
+    const result = await new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        { folder: "members" },
+        (err, result) => {
+          if (err) reject(err);
+          else resolve(result);
+        }
+      );
+      stream.end(req.file.buffer);
+    });
+    console.log(req.user);
+    const data = await savePhoto(result.secure_url, req.user);
+    res.status(200).json({
+      message: "Image uploaded successfully",
+      imageUrl: result.secure_url,
+      data,
+    });
+  } catch (err) {
+    console.error("error in uploading image from controller: ", err);
+    res.status(500).json({ message: err.message });
   }
 };

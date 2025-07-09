@@ -67,7 +67,7 @@ export const createTasks = async (
     return task;
   } catch (err) {
     console.error("error in creating task: ", err);
-    resizeBy.status(500).json({ message: "server error", error: err });
+    res.status(500).json({ message: "server error", error: err });
   }
 };
 
@@ -164,6 +164,22 @@ export const patchTaskById = async (id, user, updates) => {
     return 200;
   } catch (err) {
     console.error("error in patching the task from db: ", err);
+    throw err;
+  }
+};
+
+export const savePhoto = async (photoPath, user) => {
+  try {
+    console.log(user);
+    const addPh = await User.findByIdAndUpdate(
+      user._id,
+      { photo: photoPath },
+      { new: true }
+    );
+    if (!addPh) return 404;
+    return addPh;
+  } catch (err) {
+    console.error("error in adding photo to the db", err);
     throw err;
   }
 };

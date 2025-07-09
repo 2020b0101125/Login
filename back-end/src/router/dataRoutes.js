@@ -1,4 +1,6 @@
 import express from "express";
+import { upload } from "../middleware/uploadPhoto.js";
+import uploadImg from "../middleware/multer.js";
 import {
   register,
   login,
@@ -10,6 +12,8 @@ import {
   replaceTask,
   patchTask,
   deleteTask,
+  addPhoto,
+  uploadImage,
 } from "../controller/dataController.js";
 import { verifyToken } from "../middleware/verifyToken.js";
 import { requireRole } from "../middleware/requireRole.js";
@@ -55,4 +59,12 @@ router.patch(
 );
 
 router.delete("/task/:id", verifyToken, requireRole("admin"), deleteTask);
+
+router.patch("/addPhoto", verifyToken, upload.single("photo"), addPhoto);
+router.patch(
+  "/uploadPhoto",
+  verifyToken,
+  uploadImg.single("photo"),
+  uploadImage
+);
 export default router;
