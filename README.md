@@ -93,6 +93,42 @@ Prerequisites
 
     Server will run at http://localhost:8000
 
+## 📡 API Endpoints
+
+### 👤 Authentication & User Management
+
+| Method | Route     | Access        | Description              |
+| ------ | --------- | ------------- | ------------------------ |
+| POST   | /register | Public        | Register new user        |
+| POST   | /login    | Public        | Login and receive JWT    |
+| GET    | /me       | Authenticated | Get current user profile |
+
+### 📋 Task Management
+
+| Method | Route       | Access                    | Description                  |
+| ------ | ----------- | ------------------------- | ---------------------------- |
+| POST   | /createTask | Admin, Manager            | Create a task                |
+| GET    | /tasks      | Authenticated             | Get tasks based on user role |
+| GET    | /tasks/:id  | Admin, Manager (own only) | Get specific task details    |
+| PUT    | /task/:id   | Admin, Manager (own only) | Fully update a task          |
+| PATCH  | /task/:id   | Admin, Manager (own only) | Partially update task fields |
+| DELETE | /task/:id   | Admin                     | Delete a task                |
+
+### 🖼️ Photo Upload
+
+| Method | Route        | Access        | Description                       |
+| ------ | ------------ | ------------- | --------------------------------- |
+| PATCH  | /addPhoto    | Authenticated | Upload user image to local server |
+| PATCH  | /uploadPhoto | Authenticated | Upload user image to Cloudinary   |
+
+### 🧑‍💼 Role-Based Dashboards
+
+| Method | Route               | Access   | Description                        |
+| ------ | ------------------- | -------- | ---------------------------------- |
+| GET    | /dashboard/admin    | Admin    | View all non-admin users           |
+| GET    | /dashboard/manager  | Manager  | View all employees                 |
+| GET    | /dashboard/employee | Employee | Basic message and task view access |
+
 ## Frontend Setup
 
     cd front-end (Navigate to frontend)
