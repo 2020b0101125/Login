@@ -20,7 +20,7 @@ import { requireRole } from "../middleware/requireRole.js";
 
 const router = express.Router();
 
-router.get("/user", show);
+router.get("/user", verifyToken, requireRole("admin", "manager"), show);
 
 router.post("/register", register);
 router.post("/login", login);

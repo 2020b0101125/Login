@@ -67,20 +67,26 @@ export const createTasks = async (
     return task;
   } catch (err) {
     console.error("error in creating task: ", err);
-    res.status(500).json({ message: "server error", error: err });
+    throw err;
   }
 };
 
 export const getTasks = async (id, role) => {
   try {
     if (role === "employee") {
-      const data = await Task.find({ assignedTo: id });
+      const data = await Task.find({ assignedTo: id })
+        .populate("assignedTo")
+        .populate("assignedBy");
       return data;
     } else if (role === "manager") {
-      const data = await Task.find({ assignedBy: id });
+      const data = await Task.find({ assignedBy: id })
+        .populate("assignedTo")
+        .populate("assignedBy");
       return data;
     } else {
-      const data = await Task.find();
+      const data = await Task.find()
+        .populate("assignedTo")
+        .populate("assignedBy");
       return data;
     }
   } catch (err) {

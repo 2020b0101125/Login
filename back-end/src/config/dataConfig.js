@@ -1,7 +1,8 @@
 import mongoose from "mongoose";
+import { config } from "./configENV.js";
 const createDB = async () => {
   try {
-    await mongoose.connect("mongodb://127.0.0.1:27017/arnav");
+    await mongoose.connect(config.MONGODB_URI);
     console.log("connected to the database");
   } catch (err) {
     console.error("found error in connecting to db", err);

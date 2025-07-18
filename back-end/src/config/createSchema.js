@@ -1,7 +1,8 @@
 import mongoose from "mongoose";
 import AutoIncrementFactory from "mongoose-sequence";
+import { config } from "./configENV.js";
 
-const connection = mongoose.createConnection("mongodb://localhost:27017/arnav");
+const connection = mongoose.createConnection(config.MONGODB_URI);
 const autoInc = AutoIncrementFactory(connection);
 
 const UserSchema = new mongoose.Schema(
